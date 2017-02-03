@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.StringJoiner;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import facebook4j.Comment;
@@ -36,17 +38,22 @@ public class Main {
 				.flatMap(postComments -> postComments.stream())
 				.collect(Collectors.toList());
 		
-		
-		// Print the comments' messages
-		comments.stream()
-				.map(c -> c.getMessage())
-				.forEach(System.out::println);
-		
 		// Getting the unique words to match against
-		Set<String> uniqueWords = generateListOfSearchedPhrases(props).stream()
+		Set<String> searchedWords = generateListOfSearchedPhrases(props).stream()
 				.map(word -> word.split(" "))
 				.flatMap(s -> Arrays.stream(s))
 				.collect(Collectors.toSet());
+		
+		Pattern regex = generateRegexPattern(searchedWords);
+		
+		List<Comment> matchedComments = comments.stream()
+				.filter(s -> regex.matcher(s.getMessage()).find())
+				.collect(Collectors.toList());
+		
+		// Printing the matched comments
+		matchedComments.stream()
+				.map(comment -> comment.getMessage())
+				.forEach(System.out::println);
 	}
 
 	private static Properties loadPropertiesFile() throws IOException {
@@ -59,19 +66,27 @@ public class Main {
 		return props;
 	}
 	
+	private static Pattern generateRegexPattern(Set<String> searchedPhrases) {
+		StringJoiner stringJoiner = new StringJoiner("|"); 
+		searchedPhrases.forEach(phrase -> stringJoiner.add(phrase));
+		
+		return Pattern.compile(stringJoiner.toString());
+	}
+	
 	private static String generateSinceDateFormat(Properties props) {
 		String sinceDays = props.getProperty(COMMENTS_CREATED_SINCE_DAYS_KEY);
+		String sinceDateTimeFormat = "-" + sinceDays + " days";
 		
-		return "-" + sinceDays + " days";
+		return sinceDateTimeFormat;
 	}
 	
 	private static List<String> generateListOfSearchedPhrases(Properties props) {
 		String value = props.getProperty(COMMENTS_SEARCHED_PHRASES);
-		
 		String[] splittedPhrases = value.split(",");
-		
-		return Arrays.stream(splittedPhrases)
+		List<String> searchedPhrases = Arrays.stream(splittedPhrases)
 				.map(s -> s.toString())
 				.collect(Collectors.toList());
+		
+		return searchedPhrases;
 	}
 }
