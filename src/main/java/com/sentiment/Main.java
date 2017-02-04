@@ -8,18 +8,17 @@ import com.sentiment.data.transformer.DataTransformer;
 import com.sentiment.data.transformer.FbDataTransformer;
 import com.sentiment.data.writer.DataWriter;
 import com.sentiment.data.writer.FbDataWriter;
-
-import facebook4j.Comment;
+import com.sentiment.model.FbPostComment;
 
 public class Main {
 	
 	public static void main(String[] args) {
 		// 1. Data Consumption
-		DataConsumer<Comment> fbDataConsumer = new FbDataConsumer();
-		List<Comment> comments = fbDataConsumer.consume();
+		DataConsumer<FbPostComment> fbDataConsumer = new FbDataConsumer();
+		List<FbPostComment> comments = fbDataConsumer.consume();
 
 		// 2. Data transformation
-		DataTransformer<Comment> fbDataTransformer = new FbDataTransformer();
+		DataTransformer<FbPostComment> fbDataTransformer = new FbDataTransformer();
 		List<String> transformedData = fbDataTransformer.transform(comments);
 		
 		transformedData.stream()

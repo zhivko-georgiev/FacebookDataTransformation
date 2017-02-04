@@ -15,12 +15,10 @@ import com.sentiment.common.Constants;
 import com.sentiment.model.FbPostComment;
 import com.sentiment.util.PropertiesUtil;
 
-import facebook4j.Comment;
-
-public class FbDataTransformer implements DataTransformer<Comment> {
+public class FbDataTransformer implements DataTransformer<FbPostComment> {
 
 	@Override
-	public List<String> transform(List<Comment> data) {
+	public List<String> transform(List<FbPostComment> data) {
 		List<String> searchedPhrases = generateListOfSearchedPhrases();
 		
 		Set<String> searchedWords = searchedPhrases.stream()

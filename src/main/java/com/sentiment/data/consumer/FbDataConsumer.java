@@ -6,6 +6,7 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 import com.sentiment.common.Constants;
+import com.sentiment.model.FbPostComment;
 import com.sentiment.util.PropertiesUtil;
 
 import facebook4j.Comment;
@@ -16,10 +17,10 @@ import facebook4j.Post;
 import facebook4j.Reading;
 import facebook4j.ResponseList;
 
-public class FbDataConsumer implements DataConsumer<Comment> {
+public class FbDataConsumer implements DataConsumer<FbPostComment> {
 		
 	@Override
-	public List<Comment> consume() {
+	public List<FbPostComment> consume() {
 		Properties props = PropertiesUtil.loadPropertiesFile(Constants.FB_PROPS_FILENAME);
 		Facebook facebook = new FacebookFactory().getInstance();
 		
@@ -29,9 +30,10 @@ public class FbDataConsumer implements DataConsumer<Comment> {
 					.since(generateSinceDateFormat(props))
 					.fields("comments"));
 
-			List<Comment> comments = posts.stream()
+			List<FbPostComment> comments = posts.stream()
 					.map(post -> post.getComments())
 					.flatMap(postComments -> postComments.stream())
+					.map(comment -> new FbPostComment(comment.getId(), comment.getMessage(), comment.getCreatedTime()))
 					.collect(Collectors.toList());
 
 			return comments;
