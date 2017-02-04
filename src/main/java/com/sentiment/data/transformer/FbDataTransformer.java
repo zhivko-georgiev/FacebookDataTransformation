@@ -63,8 +63,6 @@ public class FbDataTransformer implements DataTransformer<FbPostComment> {
 		String[] splittedPhrases = value.split(",");
 		
 		return Arrays.stream(splittedPhrases)
-				.map(Object::toString)
 				.collect(Collectors.toList());
-
 	}
 }
