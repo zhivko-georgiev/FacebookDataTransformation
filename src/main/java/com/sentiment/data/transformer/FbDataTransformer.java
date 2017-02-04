@@ -23,7 +23,7 @@ public class FbDataTransformer implements DataTransformer<FbPostComment> {
 		
 		Set<String> searchedWords = searchedPhrases.stream()
 				.map(word -> word.split(" "))
-				.flatMap(s -> Arrays.stream(s))
+				.flatMap(Arrays::stream)
 				.collect(Collectors.toSet());
 
 		Pattern regex = generateRegexPattern(searchedWords);
@@ -44,29 +44,27 @@ public class FbDataTransformer implements DataTransformer<FbPostComment> {
 		jobj.add("test", new Gson().toJsonTree(fbComment));
 		String formattedJson = gson.toJson(jobj);
 
-		List<String> result = matchedComments.stream()
-				.map(c -> c.getMessage())
+		return matchedComments.stream()
+				.map(FbPostComment::getMessage)
 				.collect(Collectors.toList());
 		
-		return result;
 	}
 	
 	private Pattern generateRegexPattern(Set<String> searchedPhrases) {
 		StringJoiner stringJoiner = new StringJoiner("|");
-		searchedPhrases.forEach(phrase -> stringJoiner.add(phrase));
-	    Pattern pattern = Pattern.compile(stringJoiner.toString()); 
-
-		return pattern;
+		searchedPhrases.forEach(stringJoiner::add);
+		
+		return Pattern.compile(stringJoiner.toString()); 
 	}
 
 	private List<String> generateListOfSearchedPhrases() {
 		Properties props = PropertiesUtil.loadPropertiesFile(Constants.FB_PROPS_FILENAME);
 		String value = props.getProperty(Constants.COMMENTS_SEARCHED_PHRASES);
 		String[] splittedPhrases = value.split(",");
-		List<String> searchedPhrases = Arrays.stream(splittedPhrases)
-				.map(s -> s.toString())
+		
+		return Arrays.stream(splittedPhrases)
+				.map(Object::toString)
 				.collect(Collectors.toList());
 
-		return searchedPhrases;
 	}
 }

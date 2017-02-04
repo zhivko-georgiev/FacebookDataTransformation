@@ -13,6 +13,7 @@ import facebook4j.Comment;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
+import facebook4j.PagableList;
 import facebook4j.Post;
 import facebook4j.Reading;
 import facebook4j.ResponseList;
@@ -30,13 +31,12 @@ public class FbDataConsumer implements DataConsumer<FbPostComment> {
 					.since(generateSinceDateFormat(props))
 					.fields("comments"));
 
-			List<FbPostComment> comments = posts.stream()
-					.map(post -> post.getComments())
-					.flatMap(postComments -> postComments.stream())
+			return posts.stream()
+					.map(Post::getComments)
+					.flatMap(PagableList<Comment>::stream)
 					.map(comment -> new FbPostComment(comment.getId(), comment.getMessage(), comment.getCreatedTime()))
 					.collect(Collectors.toList());
 
-			return comments;
 		} catch (FacebookException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -47,8 +47,7 @@ public class FbDataConsumer implements DataConsumer<FbPostComment> {
 
 	private String generateSinceDateFormat(Properties props) {
 		String sinceDays = props.getProperty(Constants.COMMENTS_CREATED_SINCE_DAYS_KEY);
-		String sinceDateTimeFormat = "-" + sinceDays + " days";
-
-		return sinceDateTimeFormat;
+		
+		return "-" + sinceDays + " days";
 	}
 }
