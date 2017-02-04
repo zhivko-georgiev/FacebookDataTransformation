@@ -20,9 +20,6 @@ public class Main {
 		// 2. Data transformation
 		DataTransformer<FbPostComment> fbDataTransformer = new FbDataTransformer();
 		List<String> transformedData = fbDataTransformer.transform(comments);
-		
-		transformedData.stream()
-			.forEach(System.out::println);
 
 		// TODO: 3. Data Writing
 		DataWriter fbDataWriter = new FbDataWriter();

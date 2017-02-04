@@ -1,7 +1,7 @@
 package com.sentiment.data.transformer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -18,7 +18,7 @@ import com.sentiment.util.PropertiesUtil;
 public class FbDataTransformer implements DataTransformer<FbPostComment> {
 
 	@Override
-	public List<String> transform(List<FbPostComment> data) {
+	public List<String> transform(List<FbPostComment> fbPostsComments) {
 		List<String> searchedPhrases = generateListOfSearchedPhrases();
 		
 		Set<String> searchedWords = searchedPhrases.stream()
@@ -28,26 +28,33 @@ public class FbDataTransformer implements DataTransformer<FbPostComment> {
 
 		Pattern regex = generateRegexPattern(searchedWords);
 
-		List<FbPostComment> matchedComments = data.stream()
-				.filter(s -> regex.matcher(s.getMessage()).find())
-				.map(s -> new FbPostComment(s.getId(), s.getMessage(), s.getCreatedTime()))
+		List<FbPostComment> matchedComments = fbPostsComments.stream()
+				.filter(comment -> regex.matcher(comment.getMessage()).find())
+				.map(comment -> new FbPostComment(comment.getId(), comment.getMessage(), comment.getCreatedTime()))
 				.collect(Collectors.toList());
-
-		//TODO: Convert the comments to List of JSON Strings
+		
+		fbPostsComments.removeIf(s -> matchedComments.stream()
+				.filter(comment -> regex.matcher(s.getMessage()).find()).count() != 0);
+		
 		Gson gson = new Gson();
-		JsonObject jobj = new JsonObject();
 
-		// Convert POJO to JSON
-		String fbComment = gson.toJson(new FbPostComment("100_200", "Gosooo", new Date()));
-		
-		// Assign JSON object to new property
-		jobj.add("test", new Gson().toJsonTree(fbComment));
-		String formattedJson = gson.toJson(jobj);
-
-		return matchedComments.stream()
-				.map(FbPostComment::getMessage)
+		List<String> fbPostsCommentsJSON = fbPostsComments.stream()
+				.map(gson::toJson)
 				.collect(Collectors.toList());
 		
+		List<String> matchedCommentsJSON = matchedComments.stream()
+				.map(comment -> {
+					JsonObject jsonObj = new JsonObject();
+					jsonObj.add("test", new Gson().toJsonTree(comment));
+					
+					return gson.toJson(jsonObj);
+				})
+				.collect(Collectors.toList());
+		
+		List<String> mergedTransformedComments = new ArrayList<>(fbPostsCommentsJSON);
+		mergedTransformedComments.addAll(matchedCommentsJSON);
+		
+		return mergedTransformedComments;
 	}
 	
 	private Pattern generateRegexPattern(Set<String> searchedPhrases) {
