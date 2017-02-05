@@ -65,7 +65,7 @@ public class FbDataTransformer implements DataTransformer<FbPostComment> {
 	}
 
 	private List<String> generateListOfSearchedPhrases() {
-		Properties props = PropertiesUtil.loadPropertiesFile(Constants.FB_PROPS_FILENAME);
+		Properties props = PropertiesUtil.loadPropertiesFile(Constants.APP_PROPS_FILENAME);
 		String value = props.getProperty(Constants.COMMENTS_SEARCHED_PHRASES);
 		String[] splittedPhrases = value.split(",");
 		
