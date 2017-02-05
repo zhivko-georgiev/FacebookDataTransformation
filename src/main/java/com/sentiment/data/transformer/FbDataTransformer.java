@@ -16,17 +16,16 @@ import com.sentiment.model.FbPostComment;
 import com.sentiment.util.PropertiesUtil;
 
 public class FbDataTransformer implements DataTransformer<FbPostComment> {
+	private static final String COMMENTS_SEARCHED_PHRASES_DELIMITER = ",";
+	private static final String SEARCHED_WORDS_REGEX_SPLITTER = " ";
+	private static final String SEARCHED_WORDS_REGEX_JOINER = "|";
+	
+	private final Gson gson = new Gson();
+	private final Properties props = PropertiesUtil.loadPropertiesFile(Constants.APP_PROPS_FILENAME);
 
 	@Override
 	public List<String> transform(List<FbPostComment> fbPostsComments) {
-		List<String> searchedPhrases = generateListOfSearchedPhrases();
-		
-		Set<String> searchedWords = searchedPhrases.stream()
-				.map(word -> word.split(" "))
-				.flatMap(Arrays::stream)
-				.collect(Collectors.toSet());
-
-		Pattern regex = generateRegexPattern(searchedWords);
+		Pattern regex = generateRegexPattern(props);
 
 		List<FbPostComment> matchedComments = fbPostsComments.stream()
 				.filter(comment -> regex.matcher(comment.getMessage()).find())
@@ -34,22 +33,11 @@ public class FbDataTransformer implements DataTransformer<FbPostComment> {
 				.collect(Collectors.toList());
 		
 		fbPostsComments.removeIf(s -> matchedComments.stream()
-				.filter(comment -> regex.matcher(s.getMessage()).find()).count() != 0);
+				.filter(comment -> 
+					regex.matcher(s.getMessage()).find()).count() != 0);
 		
-		Gson gson = new Gson();
-
-		List<String> fbPostsCommentsJSON = fbPostsComments.stream()
-				.map(gson::toJson)
-				.collect(Collectors.toList());
-		
-		List<String> matchedCommentsJSON = matchedComments.stream()
-				.map(comment -> {
-					JsonObject jsonObj = new JsonObject();
-					jsonObj.add("test", new Gson().toJsonTree(comment));
-					
-					return gson.toJson(jsonObj);
-				})
-				.collect(Collectors.toList());
+		List<String> fbPostsCommentsJSON = convertRegularPostsCommentsToJSON(fbPostsComments);
+		List<String> matchedCommentsJSON = convertMatchedPostsCommentsToJSON(matchedComments);
 		
 		List<String> mergedTransformedComments = new ArrayList<>(fbPostsCommentsJSON);
 		mergedTransformedComments.addAll(matchedCommentsJSON);
@@ -57,19 +45,38 @@ public class FbDataTransformer implements DataTransformer<FbPostComment> {
 		return mergedTransformedComments;
 	}
 	
-	private Pattern generateRegexPattern(Set<String> searchedPhrases) {
-		StringJoiner stringJoiner = new StringJoiner("|");
-		searchedPhrases.forEach(stringJoiner::add);
+	private List<String> convertMatchedPostsCommentsToJSON(List<FbPostComment> matchedComments) {
+		return matchedComments.stream()
+				.map(comment -> {
+					JsonObject jsonObj = new JsonObject();
+					jsonObj.add(props.getProperty(Constants.COMMENTS_MATCHED_ADDITIONAL_PROPERTY), new Gson().toJsonTree(comment));
+					
+					return gson.toJson(jsonObj);
+				})
+				.collect(Collectors.toList());
 		
-		return Pattern.compile(stringJoiner.toString()); 
 	}
 
-	private List<String> generateListOfSearchedPhrases() {
-		Properties props = PropertiesUtil.loadPropertiesFile(Constants.APP_PROPS_FILENAME);
-		String value = props.getProperty(Constants.COMMENTS_SEARCHED_PHRASES);
-		String[] splittedPhrases = value.split(",");
-		
-		return Arrays.stream(splittedPhrases)
+	private List<String> convertRegularPostsCommentsToJSON(List<FbPostComment> fbPostsComments) {
+		return fbPostsComments.stream()
+				.map(gson::toJson)
 				.collect(Collectors.toList());
+	}
+
+	private Pattern generateRegexPattern(Properties props) {
+		List<String> searchedPhrases = Arrays.stream
+				(props.getProperty(Constants.COMMENTS_SEARCHED_PHRASES)
+				.split(COMMENTS_SEARCHED_PHRASES_DELIMITER))
+				.collect(Collectors.toList());
+		
+		Set<String> searchedWords = searchedPhrases.stream()
+				.map(word -> word.split(SEARCHED_WORDS_REGEX_SPLITTER))
+				.flatMap(Arrays::stream)
+				.collect(Collectors.toSet());
+		
+		StringJoiner stringJoiner = new StringJoiner(SEARCHED_WORDS_REGEX_JOINER);
+		searchedWords.forEach(stringJoiner::add);
+		
+		return Pattern.compile(stringJoiner.toString()); 
 	}
 }
