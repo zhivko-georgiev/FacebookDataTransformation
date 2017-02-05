@@ -15,7 +15,7 @@ public class RedisFbDataWriter implements DataWriter {
 		Properties props = PropertiesUtil.loadPropertiesFile(Constants.APP_PROPS_FILENAME);
 		try (Jedis jedisClient = new Jedis(props.getProperty(Constants.REDIS_HOSTNAME))) {
 			data.stream()
-				.forEach(string -> jedisClient.lpush(Constants.REDIS_LIST_KEY, string));
+				.forEach(string -> jedisClient.lpush(props.getProperty(Constants.REDIS_LIST_KEY, string)));
 		}
 	}
 }
