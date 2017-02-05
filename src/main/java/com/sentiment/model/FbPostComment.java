@@ -2,6 +2,8 @@ package com.sentiment.model;
 
 import java.util.Date;
 
+import org.apache.commons.lang3.Validate;
+
 public class FbPostComment {
 	private String id;
 	private String message;
@@ -9,6 +11,9 @@ public class FbPostComment {
 
 	public FbPostComment(String id, String message, Date createdTime) {
 		super();
+		Validate.notEmpty(id, "Id can't be null");
+		Validate.notEmpty(message, "Message can't be null");
+		Validate.notNull(createdTime, "CreatedTime can't be null");
 		this.id = id;
 		this.message = message;
 		this.createdTime = createdTime;

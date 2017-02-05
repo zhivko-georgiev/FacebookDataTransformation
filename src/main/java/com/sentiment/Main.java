@@ -3,6 +3,8 @@ package com.sentiment;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.log4j.Logger;
+
 import com.sentiment.data.consumer.DataConsumer;
 import com.sentiment.data.consumer.FbDataConsumer;
 import com.sentiment.data.transformer.DataTransformer;
@@ -15,15 +17,18 @@ public class Main {
 
 	public static void main(String[] args) {
 		long start = System.currentTimeMillis();
+		Logger logger = Logger.getLogger(Main.class);
 		DataConsumer<FbPostComment> fbDataConsumer = new FbDataConsumer();
-		Optional<List<FbPostComment>> comments = fbDataConsumer.consume();
+		Optional<List<FbPostComment>> commentsOptional = fbDataConsumer.consume();
 		
-		if (comments.isPresent()) {
+		if (commentsOptional.isPresent()) {
 			DataTransformer<FbPostComment> fbDataTransformer = new FbDataTransformer();
-			List<String> transformedData = fbDataTransformer.transform(comments.get());
+			List<String> transformedData = fbDataTransformer.transform(commentsOptional.get());
 
-			DataWriter consoleDataWriter = new RedisFbDataWriter();
-			consoleDataWriter.write(transformedData);
+			DataWriter redisFbDataWriter = new RedisFbDataWriter();
+			redisFbDataWriter.write(transformedData);
+		} else {
+			logger.error("No data consumed");
 		}
 
 		long time = System.currentTimeMillis() - start;
