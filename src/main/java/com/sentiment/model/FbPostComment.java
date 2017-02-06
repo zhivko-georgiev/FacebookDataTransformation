@@ -4,9 +4,13 @@ import java.util.Date;
 
 import org.apache.commons.lang3.Validate;
 
+import com.google.gson.annotations.SerializedName;
+
 public class FbPostComment {
 	private String id;
 	private String message;
+	
+	@SerializedName("created_time")
 	private Date createdTime;
 
 	public FbPostComment(String id, String message, Date createdTime) {
