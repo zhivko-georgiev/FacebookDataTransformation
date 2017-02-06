@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 
 import com.sentiment.common.Constants;
 import com.sentiment.model.FbPostComment;
-import com.sentiment.util.PropertiesUtil;
 
 import facebook4j.Comment;
 import facebook4j.Facebook;
@@ -21,12 +20,19 @@ import facebook4j.Reading;
 import facebook4j.ResponseList;
 
 public class FbDataConsumer implements DataConsumer<FbPostComment> {
+	private final Properties appProps;
+	private final Properties fbProps;
 	
+	public FbDataConsumer(Properties... properties) {
+		super();
+		appProps = properties[0];
+		fbProps = properties[1];
+	}
+
 	@Override
 	public Optional<List<FbPostComment>> consume() {
 		Logger logger = Logger.getLogger(FbDataConsumer.class);
-		Properties fbProps = PropertiesUtil.loadPropertiesFile(Constants.FB_PROPS_FILENAME);
-		Properties appProps = PropertiesUtil.loadPropertiesFile(Constants.APP_PROPS_FILENAME);
+		
 		Facebook facebook = new FacebookFactory().getInstance();
 		
 		try {

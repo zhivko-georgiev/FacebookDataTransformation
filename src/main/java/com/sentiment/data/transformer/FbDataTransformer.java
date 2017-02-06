@@ -21,11 +21,16 @@ public class FbDataTransformer implements DataTransformer<FbPostComment> {
 	private static final String SEARCHED_WORDS_REGEX_JOINER = "|";
 	
 	private final Gson gson = JsonUtil.getGson();
-	private final Properties props = PropertiesUtil.loadPropertiesFile(Constants.APP_PROPS_FILENAME);
+	private final Properties appProps;
+	
+	public FbDataTransformer(Properties... properties) {
+		super();
+		appProps = properties[0];
+	}
 
 	@Override
 	public List<String> transform(List<FbPostComment> fbPostsComments) {
-		Pattern regex = generateRegexPattern(props);
+		Pattern regex = generateRegexPattern(appProps);
 		
 		List<FbPostComment> matchedComments = matchComments(fbPostsComments, regex);
 		
@@ -64,7 +69,7 @@ public class FbDataTransformer implements DataTransformer<FbPostComment> {
 		return matchedComments.stream()
 				.map(comment -> {
 					JsonObject jsonObj = new JsonObject();
-					jsonObj.add(props.getProperty(Constants.COMMENTS_MATCHED_ADDITIONAL_PROPERTY), gson.toJsonTree(comment));
+					jsonObj.add(appProps.getProperty(Constants.COMMENTS_MATCHED_ADDITIONAL_PROPERTY), gson.toJsonTree(comment));
 					
 					return gson.toJson(jsonObj);
 				})
