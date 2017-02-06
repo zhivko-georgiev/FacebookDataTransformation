@@ -1,5 +1,4 @@
 package com.sentiment.engine;
 
-public interface Engine<T> {
-	void run();
+public interface Engine extends Runnable{
 }

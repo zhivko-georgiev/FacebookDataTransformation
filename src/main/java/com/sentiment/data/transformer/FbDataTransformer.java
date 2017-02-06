@@ -10,11 +10,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.sentiment.common.Constants;
 import com.sentiment.model.FbPostComment;
+import com.sentiment.model.MatchedFbPostComment;
 import com.sentiment.util.JsonUtil;
-import com.sentiment.util.PropertiesUtil;
 
 public class FbDataTransformer implements DataTransformer<FbPostComment> {
 	private static final String SEARCHED_WORDS_REGEX_SPLITTER_PATTERN = "[\\s,]+";
@@ -67,14 +66,9 @@ public class FbDataTransformer implements DataTransformer<FbPostComment> {
 	
 	private List<String> convertMatchedPostsCommentsToJSON(List<FbPostComment> matchedComments) {
 		return matchedComments.stream()
-				.map(comment -> {
-					JsonObject jsonObj = new JsonObject();
-					jsonObj.add(appProps.getProperty(Constants.COMMENTS_MATCHED_ADDITIONAL_PROPERTY), gson.toJsonTree(comment));
-					
-					return gson.toJson(jsonObj);
-				})
+				.map(MatchedFbPostComment::new)
+				.map(gson::toJson)
 				.collect(Collectors.toList());
-		
 	}
 
 	private List<String> convertRegularPostsCommentsToJSON(List<FbPostComment> fbPostsComments) {

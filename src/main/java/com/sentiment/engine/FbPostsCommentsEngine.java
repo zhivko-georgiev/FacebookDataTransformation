@@ -10,7 +10,7 @@ import com.sentiment.data.transformer.DataTransformer;
 import com.sentiment.data.writer.DataWriter;
 import com.sentiment.model.FbPostComment;
 
-public class FbPostsCommentsEngine implements Engine<FbPostComment> {
+public class FbPostsCommentsEngine implements Engine {
 	private final DataConsumer<FbPostComment> consumer;
 	private final DataTransformer<FbPostComment> transformer;
 	private final DataWriter writer;
@@ -22,7 +22,6 @@ public class FbPostsCommentsEngine implements Engine<FbPostComment> {
 		this.transformer = transformer;
 		this.writer = writer;
 	}
-
 
 	@Override
 	public void run() {

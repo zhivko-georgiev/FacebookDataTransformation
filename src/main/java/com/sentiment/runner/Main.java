@@ -15,15 +15,16 @@ import com.sentiment.model.FbPostComment;
 import com.sentiment.util.PropertiesUtil;
 
 public class Main {
-	private static final Properties fbProps = PropertiesUtil.loadPropertiesFile(Constants.FB_PROPS_FILENAME);
-	private static final Properties appProps = PropertiesUtil.loadPropertiesFile(Constants.APP_PROPS_FILENAME);
 
 	public static void main(String[] args) {
+		final Properties fbProps = PropertiesUtil.loadPropertiesFile(Constants.FB_PROPS_FILENAME);   
+		final Properties appProps = PropertiesUtil.loadPropertiesFile(Constants.APP_PROPS_FILENAME); 
+		
 		final DataConsumer<FbPostComment> consumer = new FbDataConsumer(appProps, fbProps);
 		final DataTransformer<FbPostComment> transformer = new FbDataTransformer(appProps);
 		final DataWriter writer = new RedisFbDataWriter();
 
-		Engine<FbPostComment> engine = new FbPostsCommentsEngine(consumer, transformer, writer);
+		Engine engine = new FbPostsCommentsEngine(consumer, transformer, writer);
 		engine.run();
 	}
 }
