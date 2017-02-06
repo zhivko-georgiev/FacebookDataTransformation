@@ -45,7 +45,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.sentiment.Main</mainClass>
+							<mainClass>com.sentiment.launcher.Main</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

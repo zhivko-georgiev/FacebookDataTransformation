@@ -1,4 +1,4 @@
-package com.sentiment.runner;
+package com.sentiment.launcher;
 
 import java.util.Properties;
 
