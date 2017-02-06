@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.google.gson.Gson;
 import com.sentiment.common.Constants;
 import com.sentiment.model.FbPostComment;
 import com.sentiment.model.MatchedFbPostComment;
@@ -18,6 +19,7 @@ public class FbDataTransformer implements DataTransformer<FbPostComment> {
 	private static final String SEARCHED_WORDS_REGEX_SPLITTER_PATTERN = "[\\s,]+";
 	private static final String SEARCHED_WORDS_REGEX_JOINER = "|";
 	
+	private final Gson gson = JsonUtil.getInstance();
 	private final Properties appProps;
 	
 	public FbDataTransformer(Properties... properties) {
@@ -65,13 +67,13 @@ public class FbDataTransformer implements DataTransformer<FbPostComment> {
 	private List<String> convertMatchedPostsCommentsToJSON(List<FbPostComment> matchedComments) {
 		return matchedComments.stream()
 				.map(MatchedFbPostComment::new)
-				.map(JsonUtil::writeToJson)
+				.map(gson::toJson)
 				.collect(Collectors.toList());
 	}
 
 	private List<String> convertRegularPostsCommentsToJSON(List<FbPostComment> fbPostsComments) {
 		return fbPostsComments.stream()
-				.map(JsonUtil::writeToJson)
+				.map(gson::toJson)
 				.collect(Collectors.toList());
 	}
 }
