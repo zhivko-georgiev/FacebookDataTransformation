@@ -2,6 +2,7 @@ package com.sentiment.common;
 
 public interface Constants {
 	String APP_PROPS_FILENAME = "application.properties";
+	String APP_PROPS_TEST_FILENAME = "application-test.properties";
 	String FB_PROPS_FILENAME = "facebook4j.properties";
 	
 	String FB_OAUTH_APPID_KEY = "oauth.appId";
