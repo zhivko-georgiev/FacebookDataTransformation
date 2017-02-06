@@ -2,6 +2,7 @@ package com.sentiment.data.transformer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -16,8 +17,7 @@ import com.sentiment.model.FbPostComment;
 import com.sentiment.util.PropertiesUtil;
 
 public class FbDataTransformer implements DataTransformer<FbPostComment> {
-	private static final String COMMENTS_SEARCHED_PHRASES_DELIMITER = ",";
-	private static final String SEARCHED_WORDS_REGEX_SPLITTER = " ";
+	private static final String SEARCHED_WORDS_REGEX_SPLITTER_PATTERN = "[\\s,]+";
 	private static final String SEARCHED_WORDS_REGEX_JOINER = "|";
 	
 	private final Gson gson = new Gson();
@@ -64,19 +64,9 @@ public class FbDataTransformer implements DataTransformer<FbPostComment> {
 	}
 
 	private Pattern generateRegexPattern(Properties props) {
-		List<String> searchedPhrases = Arrays.stream
-				(props.getProperty(Constants.COMMENTS_SEARCHED_PHRASES)
-				.split(COMMENTS_SEARCHED_PHRASES_DELIMITER))
-				.collect(Collectors.toList());
+		String[] searchedWords = props.getProperty(Constants.COMMENTS_SEARCHED_PHRASES).split(SEARCHED_WORDS_REGEX_SPLITTER_PATTERN);
+		Set<String> uniqueSearchedWords = new HashSet<>(Arrays.asList(searchedWords));
 		
-		Set<String> searchedWords = searchedPhrases.stream()
-				.map(word -> word.split(SEARCHED_WORDS_REGEX_SPLITTER))
-				.flatMap(Arrays::stream)
-				.collect(Collectors.toSet());
-		
-		StringJoiner stringJoiner = new StringJoiner(SEARCHED_WORDS_REGEX_JOINER);
-		searchedWords.forEach(stringJoiner::add);
-		
-		return Pattern.compile(stringJoiner.toString()); 
+		return Pattern.compile(String.join(SEARCHED_WORDS_REGEX_JOINER, uniqueSearchedWords), Pattern.CASE_INSENSITIVE); 
 	}
 }
