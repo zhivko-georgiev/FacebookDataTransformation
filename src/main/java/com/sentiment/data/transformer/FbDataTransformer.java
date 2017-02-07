@@ -2,6 +2,7 @@ package com.sentiment.data.transformer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -32,7 +33,10 @@ public class FbDataTransformer implements DataTransformer<FbPostComment> {
 		Pattern regex = generateRegexPattern(appProps);
 		
 		List<FbPostComment> matchedComments = matchComments(fbPostsComments, regex);
-		fbPostsComments.removeAll(matchedComments);
+		
+		fbPostsComments.removeIf(comment -> matchedComments.stream()
+				.filter(matchedComment -> 
+					regex.matcher(comment.getMessage()).find()).count() != 0);
 		
 		return mergeTransformedComments(fbPostsComments, matchedComments);
 	}
