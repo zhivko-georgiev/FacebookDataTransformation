@@ -29,8 +29,10 @@ public class FbPostsCommentsEngine implements Engine {
 		Optional<List<FbPostComment>> commentsOptional = consumer.consume();
 		
 		if (commentsOptional.isPresent()) {
+			logger.info("FbPostComments consumed. Starting transformation");
 			List<String> transformedData = transformer.transform(commentsOptional.get());
 			writer.write(transformedData);
+			logger.info(String.format("Finished transformation and writing of %d items", transformedData.size()));
 		} else {
 			logger.error("No data consumed");
 		}
