@@ -21,14 +21,12 @@ import com.sentiment.model.FbPostComment;
 import com.sentiment.util.PropertiesUtil;
 
 public class FbDataTransformerTest {
-	private final Properties appTestProps = PropertiesUtil.loadPropertiesFile(Constants.APP_PROPS_TEST_FILENAME);
-
 	private static final LocalDateTime MATCHED_FBPOSTCOMMENT_DATE = LocalDateTime.of(2017, 2, 2, 9, 46, 37);
 	private static final LocalDateTime UNMATCHED_FBPOSTCOMMENT_DATE = LocalDateTime.of(2017, 1, 26, 14, 54, 21);
 	private static final ZoneId EET_TIME_ZONE = ZoneId.of("Europe/Sofia");
 	private static final String EET_TIME_ZONE_STRING = "Europe/Sofia";
 	
-	private static final FbPostComment MATCHED_FBPOSTCOMMENT =  new FbPostComment("1916334385254169_1916334465254161", "Good morning",
+	private final FbPostComment MATCHED_FBPOSTCOMMENT =  new FbPostComment("1916334385254169_1916334465254161", "Good morning",
 			Date.from(MATCHED_FBPOSTCOMMENT_DATE.atZone(EET_TIME_ZONE).toInstant()));
 	private static final FbPostComment UNMATCHED_FBPOSTCOMMENT = new FbPostComment("1913261462228128_1913261495561458", "and it comes realtime!!!",
 			Date.from(UNMATCHED_FBPOSTCOMMENT_DATE.atZone(EET_TIME_ZONE).toInstant()));
@@ -38,7 +36,8 @@ public class FbDataTransformerTest {
 
 	private static String originalTimeZone;
 
-	private DataTransformer<FbPostComment> transformer = new FbDataTransformer(appTestProps);
+	private final Properties appTestProps = PropertiesUtil.loadPropertiesFile(Constants.APP_PROPS_TEST_FILENAME);
+	private final DataTransformer<FbPostComment> transformer = new FbDataTransformer(appTestProps);
 	
 	@BeforeClass
 	 public static void setAppropriateTimeZone() {
