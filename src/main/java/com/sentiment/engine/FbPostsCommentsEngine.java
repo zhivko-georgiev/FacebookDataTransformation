@@ -25,7 +25,6 @@ public class FbPostsCommentsEngine implements Engine {
 
 	@Override
 	public void run() {
-		long start = System.currentTimeMillis();
 		Logger logger = Logger.getLogger(FbPostsCommentsEngine.class);
 		Optional<List<FbPostComment>> commentsOptional = consumer.consume();
 		
@@ -35,9 +34,5 @@ public class FbPostsCommentsEngine implements Engine {
 		} else {
 			logger.error("No data consumed");
 		}
-
-		long time = System.currentTimeMillis() - start;
-		System.out.println(time);
 	}
-
 }
