@@ -7,12 +7,10 @@ public class JsonUtil {
 	private static final String DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 
 	private static class Holder {
-        static final Gson INSTANCE = new GsonBuilder()
-        		.setDateFormat(DATE_TIME_FORMAT)
-        		.create();
-    }
-	
+		static final Gson INSTANCE = new GsonBuilder().setDateFormat(DATE_TIME_FORMAT).create();
+	}
+
 	public static Gson getInstance() {
-        return Holder.INSTANCE;
-    }
+		return Holder.INSTANCE;
+	}
 }

@@ -23,12 +23,12 @@ public class FbDataTransformerTest {
 	private static final LocalDateTime UNMATCHED_FBPOSTCOMMENT_DATE = LocalDateTime.of(2017, 1, 26, 14, 54, 21);
 	private static final ZoneId EET_TIME_ZONE = ZoneId.of("Europe/Sofia");
 	private static final String EET_TIME_ZONE_STRING = "Europe/Sofia";
-	
-	private final FbPostComment MATCHED_FBPOSTCOMMENT =  new FbPostComment("1916334385254169_1916334465254161", "Good morning",
-			Date.from(MATCHED_FBPOSTCOMMENT_DATE.atZone(EET_TIME_ZONE).toInstant()));
-	private static final FbPostComment UNMATCHED_FBPOSTCOMMENT = new FbPostComment("1913261462228128_1913261495561458", "and it comes realtime!!!",
-			Date.from(UNMATCHED_FBPOSTCOMMENT_DATE.atZone(EET_TIME_ZONE).toInstant()));
-	
+
+	private final FbPostComment MATCHED_FBPOSTCOMMENT = new FbPostComment("1916334385254169_1916334465254161",
+			"Good morning", Date.from(MATCHED_FBPOSTCOMMENT_DATE.atZone(EET_TIME_ZONE).toInstant()));
+	private static final FbPostComment UNMATCHED_FBPOSTCOMMENT = new FbPostComment("1913261462228128_1913261495561458",
+			"and it comes realtime!!!", Date.from(UNMATCHED_FBPOSTCOMMENT_DATE.atZone(EET_TIME_ZONE).toInstant()));
+
 	private static final String MATCHED_TRANSFORMED_FBPOSTCOMMENT = "{\"test\":{\"id\":\"1916334385254169_1916334465254161\",\"message\":\"Good morning\",\"created_time\":\"2017-02-02T09:46:37+0200\"}}";
 	private static final String UNMATCHED_TRANSFORMED_FB_POST_COMMENT = "{\"id\":\"1913261462228128_1913261495561458\",\"message\":\"and it comes realtime!!!\",\"created_time\":\"2017-01-26T14:54:21+0200\"}";
 
@@ -36,13 +36,13 @@ public class FbDataTransformerTest {
 
 	private final Properties appTestProps = PropertiesUtil.loadPropertiesFile(Constants.APP_PROPS_TEST_FILENAME);
 	private final DataTransformer<FbPostComment> transformer = new FbDataTransformer(appTestProps);
-	
+
 	@BeforeClass
-	 public static void setAppropriateTimeZone() {
-        originalTimeZone = System.getProperty("user.timezone");
-        System.setProperty("user.timezone", EET_TIME_ZONE_STRING);
-    }
-	
+	public static void setAppropriateTimeZone() {
+		originalTimeZone = System.getProperty("user.timezone");
+		System.setProperty("user.timezone", EET_TIME_ZONE_STRING);
+	}
+
 	@AfterClass
 	public static void returnBackTheOriginalTimeZone() {
 		System.setProperty("user.timezone", originalTimeZone);
@@ -50,19 +50,21 @@ public class FbDataTransformerTest {
 
 	@Test
 	public void testTransformationOfMatchedFbPostComment() {
-		List<String> transformedFbPostComment = transformer.transform(new ArrayList<>(Arrays.asList(MATCHED_FBPOSTCOMMENT)));
+		List<String> transformedFbPostComment = transformer
+				.transform(new ArrayList<>(Arrays.asList(MATCHED_FBPOSTCOMMENT)));
 		assertEquals(MATCHED_TRANSFORMED_FBPOSTCOMMENT, transformedFbPostComment.get(0));
 	}
 
 	@Test
 	public void testTransformationOfUnMatchedFbPostComment() {
-		List<String> transformedFbPostComment = transformer.transform(new ArrayList<>(Arrays.asList(UNMATCHED_FBPOSTCOMMENT)));
+		List<String> transformedFbPostComment = transformer
+				.transform(new ArrayList<>(Arrays.asList(UNMATCHED_FBPOSTCOMMENT)));
 		assertEquals(UNMATCHED_TRANSFORMED_FB_POST_COMMENT, transformedFbPostComment.get(0));
 	}
 
 	@Test
 	public void testTransformationOfMatchedAndUmatchedFbPostComment() {
-				List<String> transformedFbPostComment = transformer
+		List<String> transformedFbPostComment = transformer
 				.transform(new ArrayList<>(Arrays.asList(MATCHED_FBPOSTCOMMENT, UNMATCHED_FBPOSTCOMMENT)));
 
 		assertEquals(UNMATCHED_TRANSFORMED_FB_POST_COMMENT, transformedFbPostComment.get(0));
