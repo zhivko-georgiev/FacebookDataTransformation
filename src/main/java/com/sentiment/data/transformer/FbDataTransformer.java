@@ -32,10 +32,7 @@ public class FbDataTransformer implements DataTransformer<FbPostComment> {
 		Pattern regex = generateRegexPattern(appProps);
 		
 		List<FbPostComment> matchedComments = matchComments(fbPostsComments, regex);
-		
-		fbPostsComments.removeIf(comment -> matchedComments.stream()
-				.filter(matchedComment -> 
-					regex.matcher(comment.getMessage()).find()).count() != 0);
+		fbPostsComments.removeAll(matchedComments);
 		
 		return mergeTransformedComments(fbPostsComments, matchedComments);
 	}
